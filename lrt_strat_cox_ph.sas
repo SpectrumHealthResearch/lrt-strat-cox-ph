@@ -91,7 +91,7 @@ data _null_;
     / @7 "Degrees of Freedom of the Reduced Model = " df_red      31.
     / @7 "Degrees of Freedom of the Full Model    = " df_full     31.
     / @7 "Model Degrees of Freedom                = " DF          31.
-    / @7 "Difference                              = " diff        31.2
+    / @7 "Difference between -2LogL values        = " diff        31.2
     / @7 "Chi-Square p-value                      = " pvalue      31.4
     / HBAR1;
   end;
