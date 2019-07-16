@@ -10,21 +10,23 @@
 /*  data             = The data set name                                     */
 /*  time_var         = The event time variable                               */
 /*  censor_var       = The censoring indicator variable                      */
+/*  censor_vals      = The value(s) for censored individuals                 */
 /*  strata_vars      = The stratifying variable (MUST BE CATEGORICAL)        */
 /*  quant_covariates = The names of numeric covariates in the model          */
-/*  class_covariates = The names of class covariates in the model            */
-/*  ref_value        = The reference value for the censoring variable        */
+/*  class_covariates = The names of categorical covariates in the model      */
+/*  class_opts       = Options for the class statement in PROC PHREG         */
 /*                                                                           */
 /*****************************************************************************/
 
 %macro lrt_strat_cox_ph(
-  data             = /* The data set name                              */,
-  time_var         = /* The event time variable                        */,
-  censor_var       = /* The censoring indicator variable               */,
-  strata_vars      = /* The stratifying variable (MUST BE CATEGORICAL) */,
-  quant_covariates = /* The names of numeric covariates in the model   */,
-  class_covariates = /* The names of class covariates in the model     */,
-  ref_value      = 0 /* The reference value for the censoring variable */
+  data             = /* The data set name                                 */,
+  time_var         = /* The event time variable                           */,
+  censor_var       = /* The censoring indicator variable                  */,
+  censor_vals      = /* The value(s) for censored individuals             */,
+  strata_vars      = /* The stratifying variable (MUST BE CATEGORICAL)    */,
+  quant_covariates = /* The names of numeric covariates in the model      */,
+  class_covariates = /* The names of categorical covariates in the model  */,
+  class_opts       = /* Options for the class statement in PROC PHREG     */
   );
 
 /* Local variables */
@@ -47,8 +49,8 @@
 
 /* FULL MODEL */
 proc phreg data=&data;
-  class &class_covariates &strata_vars / param = glm;
-  model &time_var*&censor_var(&ref_value) = &all_covariates &interaction_vars / type1;
+  class &class_covariates &strata_vars / &class_opts;
+  model &time_var*&censor_var(&censor_vals) = &all_covariates &interaction_vars / type1;
   strata &strata_vars;
   ods output Type1 = lrt_strat_cox_ph_type1_full;  
 run;
@@ -62,8 +64,8 @@ run;
 
 /* REDUCDED MODEL */
 proc phreg data=&data;
-  class &class_covariates &strata_vars / param = glm;
-  model &time_var*&censor_var(&ref_value) = &all_covariates / type1;
+  class &class_covariates &strata_vars / &class_opts;
+  model &time_var*&censor_var(&censor_vals) = &all_covariates / type1;
   strata &strata_vars;
   ods output Type1 = lrt_strat_cox_ph_type1_red;    
 run;
@@ -91,7 +93,7 @@ data _null_;
     / @7 "Degrees of Freedom of the Reduced Model = " df_red      31.
     / @7 "Degrees of Freedom of the Full Model    = " df_full     31.
     / @7 "Model Degrees of Freedom                = " DF          31.
-    / @7 "Difference between -2LogL values        = " diff        31.2
+    / @7 "Difference                              = " diff        31.2
     / @7 "Chi-Square p-value                      = " pvalue      31.4
     / HBAR1;
   end;
