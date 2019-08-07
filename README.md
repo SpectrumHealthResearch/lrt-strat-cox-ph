@@ -26,10 +26,35 @@ Our SAS® macro has seven parameters to be defined by the user:
 -	*class_opts =* options for the class statement in PROC PHREG
 
 #### **PROC PHREG**
-The macro contains two uses of PROC PHREG, which use the supplied dataset and specified variables. The macro variable *all_covariates* is created within the macro to include both the quantitative and categorical covariates specified by the user, and the local macro variable *interaction_vars* is initiated. A do loop is used to create all two-way interactions between each level of the stratum variable and each covariate.
-Each use of PROC PHREG contains an ods output statement which saves the Type1 test output to temporary datasets called lrt_strat_coxph_type1_full and lrt_strat_coxph_type1_red, respectively. These datasets contain the -2log*L* values from each model and the degrees of freedom (DF) associated with each. We are interested in the DF because each parameter in the full and reduced model is associated with 1 DF. In order to compute the DF for the likelihood ratio chi-square test, we need to know the difference in the number of parameters between each model. Thus, DF_full - DF_reduced = # Parameters in the full model - # Parameters in the reduced model.
+The macro contains two uses of PROC PHREG, which use the supplied dataset and specified variables. As seen in the code snippet below, the macro variable *all_covariates* is created within the macro to include both the quantitative and categorical covariates specified by the user, and the local macro variable *interaction_vars* is initiated. A do loop is used to create all two-way interactions between each level of the stratum variable and each covariate.
+
+```{SAS}
+%local error interaction_i interaction_vars all_covariates
+%let all_covariates = &quant_covariates &class_covariates
+
+%do interaction_i = 1 %to %sysfunc(countw(&all_covariates, %str( )));
+	%let interaction_vars = &interaction_vars
+```
+
+Each use of PROC PHREG contains an ods output statement which saves the Type1 test output to temporary datasets called lrt_strat_coxph_type1_full and lrt_strat_coxph_type1_red, respectively. These datasets contain the -2log*L* values from each model and the degrees of freedom (DF) associated with each. We are interested in the DF because each parameter in the full and reduced model is associated with 1 DF. In order to compute the DF for the likelihood ratio chi-square test, we need to know the difference in the number of parameters between each model. Thus, DF_full - DF_reduced = # Parameters in the full model - # Parameters in the reduced model. This is seen in the macro code below:
+
+```{SAS}
+proc phreg data=&data;
+  class &class_covariates &strata_vars / &class_opts ;
+  model &time_var*&censor_var(&censor_vals) = &all_covariates &interaction_vars / type1;
+  strata &strata_vars;
+  ods output Type1 = lrt_strat_cox_ph_type1_full;  
+run;
+
+proc phreg data=&data;
+  class &class_covariates &strata_vars / &class_opts ;
+  model &time_var*&censor_var(&censor_vals) = &all_covariates / type1;
+  strata &strata_vars;
+  ods output Type1 = lrt_strat_cox_ph_type1_red;    
+run;
+```
 
 #### **Data Steps**
-The first use of a data step in our macro sums the DF from the full model. The second data step sums the DF from the reduced model and then computes the difference between the -2Log*L* from each model (which is the test statistic), as well as the DF, and uses the probchi()function to generate the p-value of the likelihood ratio. 
+The first use of a data step in our macro sums the DF from the full model. The second data step sums the DF from the reduced model and then computes the difference between the -2Log*L* from each model (which is the test statistic), as well as the DF, and uses the `probchi()`function to generate the p-value of the likelihood ratio. 
 
 
