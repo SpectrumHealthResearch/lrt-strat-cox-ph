@@ -37,14 +37,14 @@ Here is an example usage with a dataset called [addicts](http://web1.sph.emory.e
 
 ```sas
 %lrt_strat_cox_ph(
-data=addicts, 
-	time_var=survt, 
-	censor_var=status,
-	censor_vals=0,
-	strata_vars= clinic, 
-	quant_covariates= dose ,
-	class_covariates= prison, 
-	class_opts= param=glm
+  data=addicts, 
+  time_var=survt, 
+  censor_var=status,
+  censor_vals=0,
+  strata_vars= clinic, 
+  quant_covariates= dose ,
+  class_covariates= prison, 
+  class_opts= param=glm
 );
 ```
 
