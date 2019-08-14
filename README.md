@@ -1,13 +1,13 @@
-# Likelihood Ratio Test MACRO for the Stratified Cox Proportional Hazard Model
+# Likelihood Ratio Test MACRO for the Stratified Cox Proportional Hazards Model
 
-For SAS® users, there is no way to automatically request the likelihood ratio
-test as an output when looking at two stratified Cox Proportional Hazard
+For SASÂ® users, there is no way to automatically request the likelihood ratio
+test as an output when looking at two stratified Cox Proportional Hazards
 models. Instead, this requires two PROCs and a few data steps. We created a
-SAS® MACRO to make this coding more efficient and allow the user to obtain
+SASÂ® MACRO to make this coding more efficient and allow the user to obtain
 parameter estimates for both the likelihood ratio test statistic and its
-corresponding p-value. Below explains how the use of this SAS® MACRO aids users
+corresponding p-value. Below explains how the use of this SASÂ® MACRO aids users
 in choosing between the interaction and no-interaction stratified Cox
-Proportional Hazard models. 
+Proportional Hazards models. 
 
 ## Usage
 
@@ -16,7 +16,7 @@ Proportional Hazard models.
   
 ### Parameters
 
-Our SAS® MACRO has seven parameters to be defined by the user:
+Our SASÂ® MACRO has seven parameters to be defined by the user:
 
 ```
 data             = The data set name
@@ -51,18 +51,18 @@ Here is an example usage with a dataset called [addicts](http://web1.sph.emory.e
 This will generate the PROC PHREG output tables for both the interaction and no-interaction stratified Cox Proportional Hazards models as well as a printout of the likelihood ratio test parameters and results. The table of results from this example is included below.
 
 ```
-=================================================================================                                                   
-    Stratified Cox Proportional Hazards Model Likelihood Ratio Test                                                                 
-                        Summary of results                                                                                          
----------------------------------------------------------------------------------                                                   
-      -2LogLikelihood of the Reduced Model    =                         1195.43                                                     
-      -2LogLikelihood of the Full Model       =                         1193.56                                                     
-      Degrees of Freedom of the Reduced Model =                               2                                                     
-      Degrees of Freedom of the Full Model    =                               4                                                     
-      Model Degrees of Freedom                =                               2                                                     
-      Difference                              =                            1.87                                                     
-      Chi-Square p-value                      =                          0.3925                                                     
-=================================================================================                                                   
+=================================================================================
+    Stratified Cox Proportional Hazards Model Likelihood Ratio Test              
+                        Summary of results                                       
+---------------------------------------------------------------------------------
+      -2LogLikelihood of the Reduced Model    =                         1195.43  
+      -2LogLikelihood of the Full Model       =                         1193.56  
+      Degrees of Freedom of the Reduced Model =                               2  
+      Degrees of Freedom of the Full Model    =                               4  
+      Model Degrees of Freedom                =                               2  
+      Difference                              =                            1.87  
+      Chi-Square p-value                      =                          0.3925  
+=================================================================================
 ```
 
 
