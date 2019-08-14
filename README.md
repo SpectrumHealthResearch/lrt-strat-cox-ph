@@ -69,4 +69,4 @@ This will generate the PROC PHREG output tables for both the interaction and no-
 ## Documentation
 
 A detailed explanation of usage and the underlying computational steps can be
-found in our [MWSUG paper](https://example.com/mypaper.pdf).
+found in our [MWSUG paper](https://example.com/mypaper.pdf) (coming soon!).
