@@ -33,7 +33,7 @@
 %local error strat_int interaction_i interaction_vars all_covariates;
 %let error = 0;
 %let all_covariates = &quant_covariates &class_covariates;
-*new; %let strat_int= %scan(&strata_vars,1);
+%let strat_int= %scan(&strata_vars,1);
  
 /* User Input Processing */
 %if ~%sysfunc(countw(&strata_vars, %str( ))) %then %do;
