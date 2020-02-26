@@ -11,7 +11,7 @@
 /*  time_var         = The event time variable                               */
 /*  censor_var       = The censoring indicator variable                      */
 /*  censor_vals      = The value(s) for censored individuals                 */
-/*  strata_vars      = The stratifying variable (MUST BE CATEGORICAL)        */
+/*  strata_vars      = The stratifying variable(s) (MUST BE CATEGORICAL)     */
 /*  quant_covariates = The names of numeric covariates in the model          */
 /*  class_covariates = The names of categorical covariates in the model      */
 /*  class_opts       = Options for the class statement in PROC PHREG         */
@@ -23,28 +23,37 @@
   time_var         = /* The event time variable                           */,
   censor_var       = /* The censoring indicator variable                  */,
   censor_vals      = /* The value(s) for censored individuals             */,
-  strata_vars      = /* The stratifying variable (MUST BE CATEGORICAL)    */,
+  strata_vars      = /* The stratifying variable(s) (MUST BE CATEGORICAL) */,
   quant_covariates = /* The names of numeric covariates in the model      */,
   class_covariates = /* The names of categorical covariates in the model  */,
   class_opts       = /* Options for the class statement in PROC PHREG     */
   );
 
 /* Local variables */
-%local error interaction_i interaction_vars all_covariates;
+%local error strat_int interaction_i interaction_vars all_covariates;
 %let error = 0;
 %let all_covariates = &quant_covariates &class_covariates;
-  
+*new; %let strat_int= %scan(&strata_vars,1);
+ 
 /* User Input Processing */
-%if %sysfunc(countw(&strata_vars, %str( ))) ne 1 %then %do;
-  %put ERROR: strata_vars requires exactly one variable;
+%if ~%sysfunc(countw(&strata_vars, %str( ))) %then %do;
+  %put ERROR: strata_vars requires at least one variable;
   %let error = 1;
-%end;
+%end;  
 
 %if &error = 1 %then %goto finish;
-  
-/* Create all pairwise interactions between strata_vars and covariates */
+
+/* If more than one strata variable, create new term of their combinations with the '|' */
+%if %sysfunc(countw(&strata_vars, %str( )))>1 %then %do;
+  %do r=2 %to %sysfunc(countw(&strata_vars));
+    %if &r <= %sysfunc(countw(&strata_vars)) %then
+    %let strat_int = %sysfunc(catx(|, &strat_int, %scan(&strata_vars,&r)));
+  %end;
+%end;
+
+/* Create all interactions between strata_vars and covariates */
 %do interaction_i = 1 %to %sysfunc(countw(&all_covariates, %str( )));
-  %let interaction_vars = &interaction_vars &strata_vars * %scan(&all_covariates,&interaction_i);
+  %let interaction_vars = &interaction_vars %sysfunc(catx(|, &strat_int, %scan(&all_covariates,&interaction_i)));
 %end;
 
 /* FULL MODEL */
