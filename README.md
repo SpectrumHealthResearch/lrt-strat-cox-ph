@@ -23,7 +23,7 @@ data             = The data set name
 time_var         = The event time variable
 censor_var       = The censoring indicator variable
 censor_vals      = The value(s) for censored individuals
-strata_vars      = The stratifying variable (MUST BE CATEGORICAL)
+strata_vars      = The stratifying variable(s) (MUST BE CATEGORICAL)
 quant_covariates = The names of numeric covariates in the model
 class_covariates = The names of categorical covariates in the model
 class_opts       = Options for the class statement in PROC PHREG
@@ -69,4 +69,4 @@ This will generate the PROC PHREG output tables for both the interaction and no-
 ## Documentation
 
 A detailed explanation of usage and the underlying computational steps can be
-found in our [MWSUG paper](https://example.com/mypaper.pdf) (coming soon!).
+found in our [MWSUG paper](https://www.mwsug.org/proceedings/2019/RF/MWSUG-2019-RF-100.pdf).
