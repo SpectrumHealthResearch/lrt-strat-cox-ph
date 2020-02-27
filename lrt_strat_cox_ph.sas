@@ -34,12 +34,12 @@
 %let error = 0;
 %let all_covariates = &quant_covariates &class_covariates;
 %let strat_int= %scan(&strata_vars,1);
- 
+
 /* User Input Processing */
 %if ~%sysfunc(countw(&strata_vars, %str( ))) %then %do;
   %put ERROR: strata_vars requires at least one variable;
   %let error = 1;
-%end;  
+%end;
 
 %if &error = 1 %then %goto finish;
 
@@ -61,7 +61,7 @@ proc phreg data=&data;
   class &class_covariates &strata_vars / &class_opts;
   model &time_var*&censor_var(&censor_vals) = &all_covariates &interaction_vars / type1;
   strata &strata_vars;
-  ods output Type1 = lrt_strat_cox_ph_type1_full;  
+  ods output Type1 = lrt_strat_cox_ph_type1_full;
 run;
 
 data  lrt_strat_cox_ph_type1_full (keep=neg2ll_full df_full);
@@ -76,7 +76,7 @@ proc phreg data=&data;
   class &class_covariates &strata_vars / &class_opts;
   model &time_var*&censor_var(&censor_vals) = &all_covariates / type1;
   strata &strata_vars;
-  ods output Type1 = lrt_strat_cox_ph_type1_red;    
+  ods output Type1 = lrt_strat_cox_ph_type1_red;
 run;
 
 /* Final processing and output results */
@@ -86,13 +86,13 @@ data _null_;
   df_red = sum(df_red, DF);
   if last then do;
     set lrt_strat_cox_ph_type1_full;
-    diff   = neg2ll_red - neg2ll_full; 
-    df     = df_full - df_red; 
-    pvalue = 1-probchi(diff, df); 
+    diff   = neg2ll_red - neg2ll_full;
+    df     = df_full - df_red;
+    pvalue = 1-probchi(diff, df);
     file print;
     HBAR1 = REPEAT("=",80);
     HBAR2 = REPEAT("-",80);
-    put 
+    put
       HBAR1
     / @5 "Stratified Cox Proportional Hazards Model Likelihood Ratio Test"
     / @25 "Summary of results"
