@@ -70,4 +70,5 @@ This will generate the PROC PHREG output tables for both the interaction and no-
 
 A detailed explanation of usage and the underlying computational steps can be
 found in our [MWSUG paper](https://www.mwsug.org/proceedings/2019/RF/MWSUG-2019-RF-100.pdf).
-An explanation of the updated capability of handling multiple stratafying variables can be found in our [SASGF paper](https://www.sas.com/content/dam/SAS/support/en/sas-global-forum-proceedings/2020/4907-2020.pdf)
+
+An explanation of the updated capability of handling multiple stratafying variables can be found in our [SASGF paper](https://www.sas.com/content/dam/SAS/support/en/sas-global-forum-proceedings/2020/4907-2020.pdf).
