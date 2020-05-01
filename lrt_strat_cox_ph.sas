@@ -30,30 +30,37 @@
   );
 
 /* Local variables */
-%local error strat_int interaction_i interaction_vars all_covariates;
+%local
+  error
+  var_i
+  interaction_vars
+  interaction_strata
+  all_covariates;
 %let error = 0;
 %let all_covariates = &quant_covariates &class_covariates;
-%let strat_int= %scan(&strata_vars,1);
- 
+
 /* User Input Processing */
 %if ~%sysfunc(countw(&strata_vars, %str( ))) %then %do;
   %put ERROR: strata_vars requires at least one variable;
   %let error = 1;
-%end;  
+%end;
 
 %if &error = 1 %then %goto finish;
 
-/* If more than one strata variable, create new term of their combinations with the '|' */
-%if %sysfunc(countw(&strata_vars, %str( )))>1 %then %do;
-  %do r=2 %to %sysfunc(countw(&strata_vars));
-    %if &r <= %sysfunc(countw(&strata_vars)) %then
-    %let strat_int = %sysfunc(catx(|, &strat_int, %scan(&strata_vars,&r)));
-  %end;
+/* If more than one stratum variable, create their interactions */
+%do i=1 %to %sysfunc(countw(&strata_vars, %str( )));
+  %let var_i = %scan(&strata_vars, &i);
+  %if &i eq 1 %then
+    %let interaction_strata = &var_i.;
+  %else
+    %let interaction_strata = &interaction_strata.|&var_i.;
 %end;
 
+
 /* Create all interactions between strata_vars and covariates */
-%do interaction_i = 1 %to %sysfunc(countw(&all_covariates, %str( )));
-  %let interaction_vars = &interaction_vars %sysfunc(catx(|, &strat_int, %scan(&all_covariates,&interaction_i)));
+%do i = 1 %to %sysfunc(countw(&all_covariates, %str( )));
+  %let var_i = %scan(&all_covariates,&i);
+  %let interaction_vars = &interaction_vars &interaction_strata|&var_i;
 %end;
 
 /* FULL MODEL */
@@ -61,7 +68,7 @@ proc phreg data=&data;
   class &class_covariates &strata_vars / &class_opts;
   model &time_var*&censor_var(&censor_vals) = &all_covariates &interaction_vars / type1;
   strata &strata_vars;
-  ods output Type1 = lrt_strat_cox_ph_type1_full;  
+  ods output Type1 = lrt_strat_cox_ph_type1_full;
 run;
 
 data  lrt_strat_cox_ph_type1_full (keep=neg2ll_full df_full);
@@ -76,7 +83,7 @@ proc phreg data=&data;
   class &class_covariates &strata_vars / &class_opts;
   model &time_var*&censor_var(&censor_vals) = &all_covariates / type1;
   strata &strata_vars;
-  ods output Type1 = lrt_strat_cox_ph_type1_red;    
+  ods output Type1 = lrt_strat_cox_ph_type1_red;
 run;
 
 /* Final processing and output results */
@@ -86,13 +93,13 @@ data _null_;
   df_red = sum(df_red, DF);
   if last then do;
     set lrt_strat_cox_ph_type1_full;
-    diff   = neg2ll_red - neg2ll_full; 
-    df     = df_full - df_red; 
-    pvalue = 1-probchi(diff, df); 
+    diff   = neg2ll_red - neg2ll_full;
+    df     = df_full - df_red;
+    pvalue = 1-probchi(diff, df);
     file print;
     HBAR1 = REPEAT("=",80);
     HBAR2 = REPEAT("-",80);
-    put 
+    put
       HBAR1
     / @5 "Stratified Cox Proportional Hazards Model Likelihood Ratio Test"
     / @25 "Summary of results"
